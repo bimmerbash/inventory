@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Inventory Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .inventory-container {
+            background: #fff;
+            padding: 5px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+        .inventory-container h1 {
+            display: inline-block;
+            font-size: 1.2rem;
+            margin: 0;
+            margin-right: 10px;
+        }
+        .inventory-container input {
+            font-size: 1.5rem;
+            text-align: center;
+            width: 30%;
+            margin-right: 10px;
+        }
+        .inventory-container button {
+            font-size: 1rem;
+            padding: 5px 10px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .inventory-container button:disabled {
+            background-color: #cccccc;
+        }
+        .button-container {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="inventory-container">
+        <h1>Inventory</h1>
+        <input type="number" id="inventory-number" value="0">
+        <button onclick="save()">Save</button>
+    </div>
+
+    <script>
+        let inventoryNumber = 0;
+
+        function updateInventoryDisplay() {
+            document.getElementById('inventory-number').value = inventoryNumber;
+        }
+
+        function save() {
+            let inputValue = document.getElementById('inventory-number').value;
+            if (!isNaN(inputValue)) {
+                inventoryNumber = parseInt(inputValue);
+                saveToServer();
+            } else {
+                alert("Please enter a valid number.");
+            }
+            updateInventoryDisplay();
+        }
+
+        function saveToServer() {
+            fetch('/api/inventory', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ inventoryNumber })
+            }).then(response => response.json())
+              .then(data => console.log('Saved:', data));
+        }
+
+        function loadFromServer() {
+            fetch('/api/inventory')
+                .then(response => response.json())
+                .then(data => {
+                    inventoryNumber = data.inventoryNumber;
+                    updateInventoryDisplay();
+                });
+        }
+
+        // Initialize the display
+        loadFromServer();
+    </script>
+</body>
+</html>
